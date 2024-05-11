@@ -1,11 +1,18 @@
 package org.example;
 
 public class MyHashTable<K, V>{
-    private class HashNode<K, V> {
+    public HashNode<K, V>[] getChainArray() {
+        if (chainarray == null) {
+            return new HashNode[0];
+        }
+        return chainarray;
+    }
+
+    public static class HashNode<K, V> {
         private K key;
         private V value;
-        private HashNode<K, V> next;
-        private HashNode(K key, V value){
+        public HashNode<K, V> next;
+        public HashNode(K key, V value){
             this.key=key;
             this.value=value;
         }
@@ -18,16 +25,16 @@ public class MyHashTable<K, V>{
     private int m=11;
     private int size;
     public MyHashTable(){
-        chainarray=new HashNode[m];
+        chainarray=(HashNode<K,V>[]) new HashNode[m];
         size=0;
     }
     public MyHashTable(int m){
         this.m=m;
-        chainarray=new HashNode[m];
+        chainarray=(HashNode<K,V>[]) new HashNode[m];
     }
 
     private int hash(K key){
-        return key.hashCode() %m;
+        return (key.hashCode()& 0x7fffffff) %m; //using load factor
     }
     public void put(K key, V value){
         int index=hash(key);
@@ -38,6 +45,10 @@ public class MyHashTable<K, V>{
         else{
             HashNode<K, V> currentNode=chainarray[index];
             while(currentNode.next != null){
+                if (currentNode.key.equals(key)) {
+                    currentNode.value = value;
+                    return;
+                }
                 currentNode=currentNode.next;
 
             }
